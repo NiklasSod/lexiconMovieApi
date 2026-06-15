@@ -16,7 +16,7 @@ namespace MovieApi.Models
 
         public MovieDetails? Details { get; set; }
 
-        //public List<Review> Reviews { get; set; } = new();
+        public List<Review> Reviews { get; set; } = new();
 
         //public List<MovieActor> MovieActors { get; set; } = new();
     }
