@@ -18,6 +18,6 @@ namespace MovieApi.Models
 
         public List<Review> Reviews { get; set; } = new();
 
-        //public List<MovieActor> MovieActors { get; set; } = new();
+        public List<MovieActor> MovieActors { get; set; } = new();
     }
 }
