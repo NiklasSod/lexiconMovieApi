@@ -11,8 +11,8 @@ namespace MovieApi.Models
         public int Year { get; set; }
         public int Duration { get; set; }
 
-        //public int GenreId { get; set; }
-        //public Genre? Genre { get; set; }
+        public int GenreId { get; set; }
+        public Genre? Genre { get; set; }
 
         //public MovieDetails? Details { get; set; }
 
