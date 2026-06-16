@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MovieApi.DTOs.Actor;
 using MovieApi.DTOs.Detail;
 using MovieApi.DTOs.Movie;
+using MovieApi.DTOs.MovieDetail;
+using MovieApi.DTOs.Review;
 using MovieApi.Models;
 
 namespace MovieApi.Controllers
@@ -17,7 +20,7 @@ namespace MovieApi.Controllers
             _context = context;
         }
 
-        // GET: api/Movie
+        // GET: api/Movies
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Movie>>> GetMovie()
         {
@@ -25,7 +28,51 @@ namespace MovieApi.Controllers
             return Ok(movies);
         }
 
-        // GET: api/Movie/5
+        // GET: api/MoviesWithDetail
+        [HttpGet("WithDetail/{id}")]
+        public async Task<ActionResult<MovieDetailDto>> GetMovieWithDetail(int id)
+        {
+            var movieDto = await _context.Movie
+                .Where(m => m.Id == id) // Filter first for better performance
+                .Select(m => new MovieDetailDto
+                {
+                    Id = m.Id,
+                    Title = m.Title,
+                    Year = m.Year,
+                    Duration = m.Duration,
+                    GenreId = m.GenreId,
+                    GenreName = m.Genre != null ? m.Genre.Name : string.Empty,
+
+                    Detail = m.Details != null ? new DetailDto
+                    {
+                        Id = m.Details.Id
+                        // Map other DetailDto properties here
+                    } : null,
+
+                    Actors = m.MovieActors.Select(ma => new ActorDto
+                    {
+                        Id = ma.Actor!.Id,
+                        Name = ma.Actor.Name ?? string.Empty
+                    }).ToList(),
+
+                    Reviews = m.Reviews.Select(r => new ReviewDto
+                    {
+                        Id = r.Id,
+                        Comment = r.Comment,
+                        Rating = r.Rating
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync(); // Executes the projected query
+
+            if (movieDto == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(movieDto);
+        }
+
+        // GET: api/Movies/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Movie>> GetMovie(int id)
         {
@@ -39,7 +86,7 @@ namespace MovieApi.Controllers
             return Ok(movie);
         }
 
-        // PUT: api/Movie/5
+        // PUT: api/Movies/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMovie(int? id, Movie movie)
@@ -70,7 +117,7 @@ namespace MovieApi.Controllers
             return NoContent();
         }
 
-        // PATCH: api/Movie/5
+        // PATCH: api/Movies/5
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchMovie(int id, [FromBody] JsonPatchDocument<MovieUpdateDto> patchDoc)
         {
@@ -110,7 +157,7 @@ namespace MovieApi.Controllers
             return NoContent();
         }
 
-        // POST: api/Movie
+        // POST: api/Movies
         [HttpPost]
         public async Task<ActionResult<Movie>> PostMovie(MovieCreateDto movieCreateDto)
         {
@@ -139,7 +186,7 @@ namespace MovieApi.Controllers
             return CreatedAtAction("GetMovie", new { id = movie.Id }, movie);
         }
 
-        // DELETE: api/Movie/5
+        // DELETE: api/Movies/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMovie(int? id)
         {
