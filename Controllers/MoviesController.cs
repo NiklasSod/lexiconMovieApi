@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApi.DTOs.Detail;
@@ -65,6 +66,46 @@ namespace MovieApi.Controllers
                     throw;
                 }
             }
+
+            return NoContent();
+        }
+
+        // PATCH: api/Movie/5
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchMovie(int id, [FromBody] JsonPatchDocument<MovieUpdateDto> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                return BadRequest();
+            }
+
+            var movie = await _context.Movie.FindAsync(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            var movieToPatch = new MovieUpdateDto
+            {
+                Title = movie.Title,
+                Year = movie.Year,
+                Duration = movie.Duration,
+                GenreId = movie.GenreId
+            };
+
+            patchDoc.ApplyTo(movieToPatch, ModelState);
+
+            if (!TryValidateModel(movieToPatch))
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            movie.Title = movieToPatch.Title;
+            movie.Year = movieToPatch.Year;
+            movie.Duration = movieToPatch.Duration;
+            movie.GenreId = movieToPatch.GenreId;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

@@ -4,11 +4,10 @@ using MovieApi.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("MovieApiContext") ?? throw new InvalidOperationException("Connection string 'MovieApiContext' not found.");
 
-builder.Services.AddDbContext<MovieApiContext>(options => options.UseSqlServer(connectionString));
-
 // Add services to the container.
+builder.Services.AddDbContext<MovieApiContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddControllers().AddNewtonsoftJson();
 
-builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
