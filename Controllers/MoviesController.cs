@@ -1,5 +1,6 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -62,7 +63,7 @@ namespace MovieApi.Controllers
         }
 
         // PUT: api/Movies/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMovie(int? id, Movie movie)
         {
@@ -93,6 +94,7 @@ namespace MovieApi.Controllers
         }
 
         // PATCH: api/Movies/5
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchMovie(int id, [FromBody] JsonPatchDocument<MovieUpdateDto> patchDoc)
         {
@@ -124,6 +126,7 @@ namespace MovieApi.Controllers
         }
 
         // POST: api/Movies
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Movie>> PostMovie(MovieCreateDto movieCreateDto)
         {
@@ -153,6 +156,7 @@ namespace MovieApi.Controllers
         }
 
         // DELETE: api/Movies/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMovie(int? id)
         {

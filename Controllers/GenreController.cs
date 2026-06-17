@@ -39,6 +39,7 @@ namespace MovieApi.Controllers
             return CreatedAtAction(nameof(GetGenreById), new { id = genre.Id }, genre);
         }
 
+        // GET api/Genre/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Genre>> GetGenreById(int id)
         {
@@ -52,6 +53,21 @@ namespace MovieApi.Controllers
             return genre;
         }
 
-        // delete with auth
+        // DELETE api/Genre/5
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteGenreById(int id)
+        {
+            var genre = _context.Genres.Find(id);
+            if (genre == null)
+            {
+                return NotFound();
+            }
+
+            _context.Genres.Remove(genre);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
