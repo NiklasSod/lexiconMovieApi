@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApi.DTOs.Genre;
 using MovieApi.Models;
@@ -16,6 +17,7 @@ namespace MovieApi.Controllers
         }
 
         // Post: api/Genre
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Genre>> CreateGenre([FromBody] GenreCreateDto genreDto)
         {
@@ -49,5 +51,7 @@ namespace MovieApi.Controllers
 
             return genre;
         }
+
+        // delete with auth
     }
 }
