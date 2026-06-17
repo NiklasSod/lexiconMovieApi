@@ -33,7 +33,7 @@ namespace MovieApi.Controllers
         public async Task<ActionResult<MovieDetailDto>> GetMovieWithDetail(int id)
         {
             var movieDto = await _context.Movie
-                .Where(m => m.Id == id) // Filter first for better performance
+                .Where(m => m.Id == id)
                 .Select(m => new MovieDetailDto
                 {
                     Id = m.Id,
@@ -45,8 +45,11 @@ namespace MovieApi.Controllers
 
                     Detail = m.Details != null ? new DetailDto
                     {
-                        Id = m.Details.Id
-                        // Map other DetailDto properties here
+                        Id = m.Details.Id,
+                        Synopsis = m.Details.Synopsis,
+                        Director = m.Details.Director,
+                        Language = m.Details.Language,
+                        Budget = m.Details.Budget
                     } : null,
 
                     Actors = m.MovieActors.Select(ma => new ActorDto
@@ -62,7 +65,7 @@ namespace MovieApi.Controllers
                         Rating = r.Rating
                     }).ToList()
                 })
-                .FirstOrDefaultAsync(); // Executes the projected query
+                .FirstOrDefaultAsync();
 
             if (movieDto == null)
             {
