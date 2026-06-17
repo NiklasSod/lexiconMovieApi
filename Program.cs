@@ -7,6 +7,7 @@ var connectionString = builder.Configuration.GetConnectionString("MovieApiContex
 // Add services to the container.
 builder.Services.AddDbContext<MovieApiContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddAutoMapper(typeof(Program));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

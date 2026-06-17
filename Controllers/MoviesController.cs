@@ -1,11 +1,11 @@
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MovieApi.DTOs.Actor;
 using MovieApi.DTOs.Detail;
 using MovieApi.DTOs.Movie;
 using MovieApi.DTOs.MovieDetail;
-using MovieApi.DTOs.Review;
 using MovieApi.Models;
 
 namespace MovieApi.Controllers
@@ -15,9 +15,11 @@ namespace MovieApi.Controllers
     public class MoviesController : ControllerBase
     {
         private readonly MovieApiContext _context;
-        public MoviesController(MovieApiContext context)
+        private readonly IMapper _mapper;
+        public MoviesController(MovieApiContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Movies
@@ -28,43 +30,13 @@ namespace MovieApi.Controllers
             return Ok(movies);
         }
 
-        // GET: api/MoviesWithDetail
+        // GET: api/MoviesWithDetail/5
         [HttpGet("WithDetail/{id}")]
         public async Task<ActionResult<MovieDetailDto>> GetMovieWithDetail(int id)
         {
             var movieDto = await _context.Movie
                 .Where(m => m.Id == id)
-                .Select(m => new MovieDetailDto
-                {
-                    Id = m.Id,
-                    Title = m.Title,
-                    Year = m.Year,
-                    Duration = m.Duration,
-                    GenreId = m.GenreId,
-                    GenreName = m.Genre != null ? m.Genre.Name : string.Empty,
-
-                    Detail = m.Details != null ? new DetailDto
-                    {
-                        Id = m.Details.Id,
-                        Synopsis = m.Details.Synopsis,
-                        Director = m.Details.Director,
-                        Language = m.Details.Language,
-                        Budget = m.Details.Budget
-                    } : null,
-
-                    Actors = m.MovieActors.Select(ma => new ActorDto
-                    {
-                        Id = ma.Actor!.Id,
-                        Name = ma.Actor.Name ?? string.Empty
-                    }).ToList(),
-
-                    Reviews = m.Reviews.Select(r => new ReviewDto
-                    {
-                        Id = r.Id,
-                        Comment = r.Comment,
-                        Rating = r.Rating
-                    }).ToList()
-                })
+                .ProjectTo<MovieDetailDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
             if (movieDto == null)
