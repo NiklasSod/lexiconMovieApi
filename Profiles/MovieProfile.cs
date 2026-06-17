@@ -29,6 +29,8 @@ namespace MovieApi.Profiles
             CreateMap<MovieUpdateDto, Movie>();
 
             CreateMap<ActorUpdateDto, Actor>();
+            CreateMap<ActorCreateDto, Actor>();
+            CreateMap<Actor, ActorDto>();
         }
     }
 }

@@ -68,12 +68,14 @@ public class ActorsController : ControllerBase
     // POST: api/Actors
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<Actor>> PostActor(Actor actor)
+    public async Task<ActionResult<Actor>> PostActor(ActorCreateDto actorDto)
     {
+        var actor = _mapper.Map<Actor>(actorDto);
         _context.Actors.Add(actor);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetActor", new { id = actor.Id }, actor);
+        var returnDto = _mapper.Map<ActorDto>(actor);
+        return CreatedAtAction("GetActor", new { id = returnDto.Id }, returnDto);
     }
 
     // DELETE: api/Actors/5
