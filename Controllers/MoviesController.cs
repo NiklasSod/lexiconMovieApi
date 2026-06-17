@@ -107,13 +107,7 @@ namespace MovieApi.Controllers
                 return NotFound();
             }
 
-            var movieToPatch = new MovieUpdateDto
-            {
-                Title = movie.Title,
-                Year = movie.Year,
-                Duration = movie.Duration,
-                GenreId = movie.GenreId
-            };
+            var movieToPatch = _mapper.Map<MovieUpdateDto>(movie);
 
             patchDoc.ApplyTo(movieToPatch, ModelState);
 
@@ -122,10 +116,7 @@ namespace MovieApi.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            movie.Title = movieToPatch.Title;
-            movie.Year = movieToPatch.Year;
-            movie.Duration = movieToPatch.Duration;
-            movie.GenreId = movieToPatch.GenreId;
+            _mapper.Map(movieToPatch, movie);
 
             await _context.SaveChangesAsync();
 
