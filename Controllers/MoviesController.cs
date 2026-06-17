@@ -65,14 +65,18 @@ namespace MovieApi.Controllers
         // PUT: api/Movies/5
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMovie(int? id, Movie movie)
+        public async Task<IActionResult> PutMovie(int? id, MovieUpdateDto movieDto)
         {
-            if (id != movie.Id)
+            // Reminder: put from a postman perspective should need everything (also id)
+            // but this controller changes how it connects to the db through DTO
+
+            var movie = await _context.Movie.FindAsync(id);
+            if (movie == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(movie).State = EntityState.Modified;
+            _mapper.Map(movieDto, movie);
 
             try
             {
@@ -80,14 +84,8 @@ namespace MovieApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MovieExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                if (!MovieExists(id)) { return NotFound(); }
+                else { throw; }
             }
 
             return NoContent();
