@@ -153,6 +153,60 @@ namespace MovieApi.Controllers
             return CreatedAtAction("GetMovie", new { id = movie.Id }, movie);
         }
 
+        // POST: api/Movies/2/actors/3
+        [Authorize]
+        [HttpPost("{movieId}/actors/{actorId}")]
+        public async Task<IActionResult> AddActorToMovie(int movieId, int actorId)
+        {
+            var movie = await _context.Movie.FindAsync(movieId);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            var actor = await _context.Actors.FindAsync(actorId);
+            if (actor == null)
+            {
+                return NotFound();
+            }
+
+            var alreadyLinked = await _context.MovieActors
+                .AnyAsync(ma => ma.MovieId == movieId && ma.ActorId == actorId);
+
+            if (alreadyLinked)
+            {
+                return BadRequest("This actor is already assigned to this movie.");
+            }
+
+            var movieActor = new MovieActor
+            {
+                MovieId = movieId,
+                ActorId = actorId
+            };
+
+            _context.MovieActors.Add(movieActor);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // DELETE: api/Movies/2/actors/3
+        [Authorize]
+        [HttpDelete("{movieId}/actors/{actorId}")]
+        public async Task<IActionResult> DeleteActorToMovie(int movieId, int actorId)
+        {
+            var movieActor = await _context.MovieActors.FindAsync(movieId, actorId);
+            if (movieActor == null)
+            {
+                return NotFound("This actor is not assigned to this movie.");
+            }
+
+            _context.MovieActors.Remove(movieActor);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         // DELETE: api/Movies/5
         [Authorize]
         [HttpDelete("{id}")]
