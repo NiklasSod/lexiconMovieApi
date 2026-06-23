@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -34,7 +34,7 @@ builder.Services.AddAuthentication(options =>
 // Add services to the container.
 builder.Services.AddDbContext<MovieApiContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddControllers().AddNewtonsoftJson();
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
