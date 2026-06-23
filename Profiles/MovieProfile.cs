@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MovieApi.DTOs.Actor;
 using MovieApi.DTOs.Detail;
 using MovieApi.DTOs.Movie;
@@ -13,6 +13,9 @@ namespace MovieApi.Profiles
         public MovieProfile()
         {
             CreateMap<Review, ReviewDto>();
+
+            CreateMap<ReviewCreateDto, Review>();
+            CreateMap<ReviewUpdateDto, Review>();
 
             CreateMap<MovieDetails, DetailDto>();
 
