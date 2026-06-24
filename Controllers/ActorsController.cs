@@ -22,7 +22,8 @@ public class ActorsController : ControllerBase
     public async Task<ActionResult<IEnumerable<Actor>>> GetActor()
     {
         var actors = await _context.Actors.ToListAsync();
-        return Ok(actors);
+        var actorDtos = _mapper.Map<IEnumerable<ActorDto>>(actors);
+        return Ok(actorDtos);
     }
 
     // GET: api/Actors/5
@@ -36,7 +37,8 @@ public class ActorsController : ControllerBase
             return NotFound();
         }
 
-        return Ok(actor);
+        var actorDto = _mapper.Map<ActorDto>(actor);
+        return Ok(actorDto);
     }
 
     // PUT: api/Actors/5

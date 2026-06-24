@@ -1,4 +1,4 @@
-﻿using MovieApi.Models;
+using MovieApi.Models;
 
 namespace MovieApi.Extensions
 {
@@ -72,11 +72,11 @@ namespace MovieApi.Extensions
             context.Reviews.AddRange(review1, review2, review3, review4);
 
             context.MovieActors.AddRange(
-                new MovieActor { Movie = movie1, Actor = actor1 },
-                new MovieActor { Movie = movie1, Actor = actor2 },
-                new MovieActor { Movie = movie2, Actor = actor1 },
-                new MovieActor { Movie = movie2, Actor = actor2 },
-                new MovieActor { Movie = movie3, Actor = actor3 }
+                new MovieActor { Movie = movie1, Actor = actor1, Role = "Neo" },
+                new MovieActor { Movie = movie1, Actor = actor2, Role = "Trinity" },
+                new MovieActor { Movie = movie2, Actor = actor1, Role = "Neo" },
+                new MovieActor { Movie = movie2, Actor = actor2, Role = "Trinity" },
+                new MovieActor { Movie = movie3, Actor = actor3, Role = "Eddie Cusack" }
             );
 
             context.SaveChanges();

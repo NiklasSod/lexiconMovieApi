@@ -1,4 +1,4 @@
-﻿namespace MovieApi.Models
+namespace MovieApi.Models
 {
     public class MovieActor
     {
@@ -7,5 +7,6 @@
 
         public int ActorId { get; set; }
         public Actor? Actor { get; set; }
+        public string Role { get; set; } = string.Empty;
     }
 }
