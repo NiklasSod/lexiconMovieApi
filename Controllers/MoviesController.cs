@@ -178,7 +178,7 @@ namespace MovieApi.Controllers
         // POST: api/Movies/2/actors/3
         [Authorize]
         [HttpPost("{movieId}/actors/{actorId}")]
-        public async Task<IActionResult> AddActorToMovie(int movieId, int actorId)
+        public async Task<IActionResult> AddActorToMovie(int movieId, int actorId, [FromBody] string role)
         {
             var movie = await _context.Movie.FindAsync(movieId);
             if (movie == null)
@@ -203,7 +203,8 @@ namespace MovieApi.Controllers
             var movieActor = new MovieActor
             {
                 MovieId = movieId,
-                ActorId = actorId
+                ActorId = actorId,
+                Role = role
             };
 
             _context.MovieActors.Add(movieActor);

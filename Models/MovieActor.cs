@@ -1,3 +1,5 @@
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace MovieApi.Models
 {
     public class MovieActor
@@ -7,6 +9,8 @@ namespace MovieApi.Models
 
         public int ActorId { get; set; }
         public Actor? Actor { get; set; }
+
+        [Required]
         public string Role { get; set; } = string.Empty;
     }
 }

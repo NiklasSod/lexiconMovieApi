@@ -1,5 +1,6 @@
 using AutoMapper;
 using MovieApi.DTOs.Actor;
+using MovieApi.DTOs.ActorRole;
 using MovieApi.DTOs.Detail;
 using MovieApi.DTOs.Movie;
 using MovieApi.DTOs.MovieDetail;
@@ -37,6 +38,12 @@ namespace MovieApi.Profiles
             CreateMap<ActorUpdateDto, Actor>();
             CreateMap<ActorCreateDto, Actor>();
             CreateMap<Actor, ActorDto>();
+
+            CreateMap<ActorRoleCreateDto, MovieActor>();
+            CreateMap<ActorRoleUpdateDto, MovieActor>();
+            CreateMap<MovieActor, ActorRoleDto>()
+                .ForMember(dest => dest.ActorId, opt => opt.MapFrom(src => src.Actor != null ? src.Actor.Id : 0))
+                .ForMember(dest => dest.ActorName, opt => opt.MapFrom(src => src.Actor != null ? src.Actor.Name : string.Empty));
         }
     }
 }
