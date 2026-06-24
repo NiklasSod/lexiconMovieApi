@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -25,9 +25,31 @@ namespace MovieApi.Controllers
 
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetMovie()
+        public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(
+            [FromQuery] string? genre = null,
+            [FromQuery] int? year = null,
+            [FromQuery] string? actor = null)
         {
-            var movies = await _context.Movie.ToListAsync();
+            var query = _context.Movie
+                .Include(m => m.Genre)
+                .Include(m => m.MovieActors)
+                    .ThenInclude(ma => ma.Actor)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(genre))
+                query = query.Where(m => m.Genre != null && m.Genre.Name.ToLower() == genre.ToLower());
+
+            if (year.HasValue)
+                query = query.Where(m => m.Year == year.Value);
+
+            if (!string.IsNullOrWhiteSpace(actor))
+                query = query.Where(m => m.MovieActors
+                    .Any(ma => ma.Actor != null && ma.Actor.Name.ToLower() == actor.ToLower()));
+
+            var movies = await query
+                .ProjectTo<MovieDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
             return Ok(movies);
         }
 

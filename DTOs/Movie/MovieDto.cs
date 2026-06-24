@@ -7,5 +7,6 @@ namespace MovieApi.DTOs.Movie
         public int Year { get; init; }
         public int Duration { get; init; }
         public int GenreId { get; init; }
+        public string GenreName { get; init; } = string.Empty;
     }
 }

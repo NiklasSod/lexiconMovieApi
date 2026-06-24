@@ -28,6 +28,9 @@ namespace MovieApi.Profiles
                 .ForMember(dest => dest.Detail, opt => opt.MapFrom(src => src.Details))
                 .ForMember(dest => dest.Actors, opt => opt.MapFrom(src => src.MovieActors));
 
+            CreateMap<Movie, MovieDto>()
+                .ForMember(dest => dest.GenreName, opt => opt.MapFrom(src => src.Genre != null ? src.Genre.Name : string.Empty));
+
             CreateMap<Movie, MovieUpdateDto>();
             CreateMap<MovieUpdateDto, Movie>();
 
