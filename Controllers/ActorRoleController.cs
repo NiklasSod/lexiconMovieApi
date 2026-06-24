@@ -95,21 +95,4 @@ public class ActorRoleController : ControllerBase
 
         return NoContent();
     }
-
-    // DELETE: api/movies/2/cast/3
-    [Authorize]
-    [HttpDelete("{actorId}")]
-    public async Task<IActionResult> RemoveCastMember(int movieId, int actorId)
-    {
-        var movieActor = await _context.MovieActors
-            .FirstOrDefaultAsync(ma => ma.MovieId == movieId && ma.ActorId == actorId);
-
-        if (movieActor == null)
-            return NotFound();
-
-        _context.MovieActors.Remove(movieActor);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
-    }
 }
