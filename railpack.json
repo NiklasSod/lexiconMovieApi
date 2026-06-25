@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "https://schema.railpack.com",
   "steps": {
     "build": {
@@ -8,7 +8,7 @@
         }
       ],
       "commands": [
-        "cd MovieApi && dotnet publish -c Release -o ../out"
+        "dotnet publish MovieApi/MovieApi.csproj -c Release -o out"
       ]
     }
   },
