@@ -1,7 +1,8 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MovieApi.Models;
+using MovieApi;
 
-public class MovieApiContext(DbContextOptions<MovieApiContext> options) : DbContext(options)
+ public class MovieApiContext(DbContextOptions<MovieApiContext> options) : DbContext(options), IMovieApiContext
 {
     public DbSet<MovieApi.Models.Movie> Movie { get; set; } = default!;
 

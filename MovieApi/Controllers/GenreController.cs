@@ -10,8 +10,8 @@ namespace MovieApi.Controllers
     [ApiController]
     public class GenreController : ControllerBase
     {
-        private readonly MovieApiContext _context;
-        public GenreController(MovieApiContext context)
+        private readonly IMovieApiContext _context;
+        public GenreController(IMovieApiContext context)
         {
             _context = context;
         }
@@ -58,7 +58,7 @@ namespace MovieApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGenreById(int id)
         {
-            var genre = _context.Genres.Find(id);
+            var genre = _context.Genres.FirstOrDefault(g => g.Id == id);
             if (genre == null)
             {
                 return NotFound();
