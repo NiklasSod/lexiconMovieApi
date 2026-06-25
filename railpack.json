@@ -1,13 +1,10 @@
-{
+﻿{
   "$schema": "https://schema.railpack.com",
   "steps": {
     "build": {
       "inputs": [
         {
           "image": "mcr.microsoft.com/dotnet/sdk:10.0"
-        },
-        {
-          "local": "."
         }
       ],
       "commands": [
