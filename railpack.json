@@ -11,8 +11,7 @@
         }
       ],
       "commands": [
-        "dotnet restore ./MovieApi/MovieApi.csproj",
-        "dotnet publish ./MovieApi/MovieApi.csproj --no-restore -c Release -o out"
+        "dotnet publish ./MovieApi/MovieApi.csproj -c Release -o out"
       ]
     }
   },
@@ -23,9 +22,7 @@
       },
       {
         "step": "build",
-        "include": [
-          "out/"
-        ]
+        "include": ["out/"]
       }
     ],
     "startCommand": "dotnet out/MovieApi.dll"
