@@ -42,7 +42,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Add services to the container.
-builder.Services.AddDbContext<MovieApiContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<MovieApiContext>(options => options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure()));
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 
