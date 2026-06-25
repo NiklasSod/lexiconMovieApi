@@ -5,6 +5,11 @@
       "commands": [
         "dotnet publish ./MovieApi/MovieApi.csproj --no-restore -c Release -o out"
       ]
+    },
+    "run": {
+      "commands": [
+        "dotnet out/MovieApi.dll"
+      ]
     }
   }
 }
