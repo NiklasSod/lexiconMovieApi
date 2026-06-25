@@ -1,2 +1,2 @@
 ﻿[phases.build]
-cmds = ['dotnet publish MovieApi.csproj --no-restore -c Release -o out']
+cmds = ['dotnet publish ./MovieApi/MovieApi.csproj --no-restore -c Release -o out']
