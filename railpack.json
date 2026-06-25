@@ -2,12 +2,32 @@
   "$schema": "https://schema.railpack.com",
   "steps": {
     "build": {
+      "inputs": [
+        {
+          "image": "mcr.microsoft.com/dotnet/sdk:10.0"
+        },
+        {
+          "local": true
+        }
+      ],
       "commands": [
+        "dotnet restore ./MovieApi/MovieApi.csproj",
         "dotnet publish ./MovieApi/MovieApi.csproj --no-restore -c Release -o out"
       ]
     }
   },
   "deploy": {
+    "inputs": [
+      {
+        "image": "mcr.microsoft.com/dotnet/aspnet:10.0"
+      },
+      {
+        "step": "build",
+        "include": [
+          "out/"
+        ]
+      }
+    ],
     "startCommand": "dotnet out/MovieApi.dll"
   }
 }
