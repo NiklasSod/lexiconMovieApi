@@ -153,6 +153,7 @@ namespace MovieApi.Controllers
             var movie = new Movie
             {
                 Title = movieCreateDto.Title,
+                Image = movieCreateDto.Image,
                 Year = movieCreateDto.Year,
                 Duration = movieCreateDto.Duration,
                 GenreId = movieCreateDto.GenreId
@@ -160,7 +161,7 @@ namespace MovieApi.Controllers
 
             if (movieCreateDto.Detail != null)
             {
-                movieCreateDto.Detail = new DetailUpdateDto
+                movie.Details = new MovieDetails
                 {
                     Synopsis = movieCreateDto.Detail.Synopsis,
                     Director = movieCreateDto.Detail.Director,
