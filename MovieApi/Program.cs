@@ -9,15 +9,20 @@ Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 string connectionString;
+string blobToken;
 if (builder.Environment.IsDevelopment())
 {
     connectionString = builder.Configuration.GetConnectionString("MovieApiContext")
         ?? throw new InvalidOperationException("Local connection string 'MovieApiContext' not found in appsettings.Development.json.");
+    blobToken = builder.Configuration["VERCEL_BLOB_TOKEN"]
+        ?? throw new InvalidOperationException("VERCEL_BLOB_TOKEN not found. Ensure .env contains this variable.");
 }
 else
 {
     connectionString = builder.Configuration["AZURE_SQL_CONNECTIONSTRING"]
         ?? throw new InvalidOperationException("Azure SQL connection string 'AZURE_SQL_CONNECTIONSTRING' not found. Ensure .env contains this variable.");
+    blobToken = builder.Configuration["BLOB_READ_WRITE_TOKEN"]
+        ?? throw new InvalidOperationException("Vercel blob 'BLOB_READ_WRITE_TOKEN' not found. Ensure .env contains this variable.");
 }
 
 var jwtSecret = builder.Configuration["JWT_SECRET"];
