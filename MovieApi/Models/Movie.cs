@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace MovieApi.Models
 {
@@ -8,6 +8,7 @@ namespace MovieApi.Models
 
         [Required]
         public string Title { get; set; } = string.Empty;
+        public string Image { get; set; } = string.Empty;
         public int Year { get; set; }
         public int Duration { get; set; }
 

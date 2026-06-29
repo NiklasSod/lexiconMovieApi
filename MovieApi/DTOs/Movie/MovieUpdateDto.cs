@@ -1,4 +1,4 @@
-﻿using MovieApi.DTOs.MovieDetail;
+using MovieApi.DTOs.MovieDetail;
 using System.ComponentModel.DataAnnotations;
 
 namespace MovieApi.DTOs.Movie
@@ -8,6 +8,7 @@ namespace MovieApi.DTOs.Movie
         [Required]
         [StringLength(200)]
         public string Title { get; set; } = string.Empty;
+        public string Image { get; set; } = string.Empty;
 
         [Range(1888, 2100)]
         public int Year { get; set; }
