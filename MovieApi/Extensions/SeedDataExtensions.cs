@@ -28,6 +28,7 @@ namespace MovieApi.Extensions
             var movie1 = new Movie
             {
                 Title = "The Matrix",
+                Image = "",
                 Year = 1999,
                 Duration = 136,
                 Genre = scifi,
@@ -41,6 +42,7 @@ namespace MovieApi.Extensions
             var movie2 = new Movie
             {
                 Title = "The Matrix Resurrections",
+                Image = "",
                 Year = 2021,
                 Duration = 148,
                 Genre = scifi,
@@ -54,6 +56,7 @@ namespace MovieApi.Extensions
             var movie3 = new Movie
             {
                 Title = "Code of Silence",
+                Image = "",
                 Year = 1985,
                 Duration = 100,
                 Genre = action,

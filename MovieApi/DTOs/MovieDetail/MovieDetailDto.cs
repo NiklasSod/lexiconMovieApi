@@ -8,6 +8,7 @@ namespace MovieApi.DTOs.MovieDetail
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
+        public string Image { get; set; } = string.Empty;
         public int Year { get; set; }
         public int Duration { get; set; }
         public int GenreId { get; set; }
