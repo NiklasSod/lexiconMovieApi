@@ -8,6 +8,7 @@ using MovieApi.DTOs.Detail;
 using MovieApi.DTOs.Movie;
 using MovieApi.DTOs.MovieDetail;
 using MovieApi.Models;
+using System.Net;
 
 namespace MovieApi.Controllers
 {
@@ -23,6 +24,41 @@ namespace MovieApi.Controllers
             _mapper = mapper;
         }
 
+        // temp get movies method for trying out created JWT
+        // GET: api/Movies
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(
+            [FromQuery] string? genre = null,
+            [FromQuery] int? year = null,
+            [FromQuery] string? actor = null)
+        {
+            var query = _context.Movie
+                .Include(m => m.Genre)
+                .Include(m => m.MovieActors)
+                    .ThenInclude(ma => ma.Actor)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(genre))
+                query = query.Where(m => m.Genre != null && m.Genre.Name.ToLower() == genre.ToLower());
+
+            if (year.HasValue)
+                query = query.Where(m => m.Year == year.Value);
+
+            if (!string.IsNullOrWhiteSpace(actor))
+                query = query.Where(m => m.MovieActors
+                    .Any(ma => ma.Actor != null && ma.Actor.Name.ToLower() == actor.ToLower()));
+
+            var movies = await query
+                .ProjectTo<MovieDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            var userName =
+                User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+            return Ok((new { Message = $"Grattis {userName}, du har nått en skyddad endpoint!" }, movies));
+        }
+
+        /*
         // GET: api/Movies
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(
@@ -52,6 +88,7 @@ namespace MovieApi.Controllers
 
             return Ok(movies);
         }
+        */
 
         // GET: api/MoviesWithDetail/5
         [HttpGet("WithDetail/{id}")]
