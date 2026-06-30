@@ -26,10 +26,16 @@ else
 }
 
 // changed to follow the lab
-var jwtSecret = builder.Configuration["JwtSettings:Secret"];
 //var jwtSecret = builder.Configuration["JWT_SECRET"];
+var jwtSecret = builder.Configuration["JwtSettings:Secret"];
+var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
+var jwtAudience = builder.Configuration["JwtSettings:Audience"];
 if (string.IsNullOrEmpty(jwtSecret))
     throw new InvalidOperationException("JWT_SECRET is missing or empty. Authentication will not work.");
+if (string.IsNullOrEmpty(jwtIssuer))
+    throw new InvalidOperationException("JWT_ISSUER is missing or empty. Authentication will not work.");
+if (string.IsNullOrEmpty(jwtAudience))
+    throw new InvalidOperationException("JWT_AUDIENCE is missing or empty. Authentication will not work.");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -42,9 +48,11 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = false // update if app go live and real login
+        ValidateIssuer = true,
+        ValidIssuer = jwtIssuer,
+        ValidateAudience = true,
+        ValidAudience = jwtAudience,
+        ValidateLifetime = true
     };
 });
 
@@ -53,6 +61,9 @@ builder.Services.AddDbContext<MovieApiContext>(options => options.UseSqlServer(c
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -63,6 +74,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 if (app.Environment.IsDevelopment())
