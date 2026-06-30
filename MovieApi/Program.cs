@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,7 +25,9 @@ else
         ?? throw new InvalidOperationException("Vercel blob 'BLOB_READ_WRITE_TOKEN' not found. Ensure .env contains this variable.");
 }
 
-var jwtSecret = builder.Configuration["JWT_SECRET"];
+// changed to follow the lab
+var jwtSecret = builder.Configuration["JwtSettings:Secret"];
+//var jwtSecret = builder.Configuration["JWT_SECRET"];
 if (string.IsNullOrEmpty(jwtSecret))
     throw new InvalidOperationException("JWT_SECRET is missing or empty. Authentication will not work.");
 
