@@ -1,19 +1,32 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieApi.Extensions;
 using System.Text;
 
-Env.Load();
+// Only load .env file if it exists (not present in Docker containers — config comes from env vars)
+var envFilePath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+if (File.Exists(envFilePath))
+{
+    Env.Load(envFilePath);
+}
 
 var builder = WebApplication.CreateBuilder(args);
-string connectionString;
+
+var isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+string? connectionString;
 string blobToken;
 if (builder.Environment.IsDevelopment())
 {
-    connectionString = builder.Configuration.GetConnectionString("MovieApiContext")
-        ?? throw new InvalidOperationException("Local connection string 'MovieApiContext' not found in appsettings.Development.json.");
+    //connectionString = Environment.GetEnvironmentVariable("DOCKER_SQL_CONNECTIONSTRING")
+    //    ?? builder.Configuration.GetConnectionString("MovieApiContext")
+    //    ?? throw new InvalidOperationException("Local connection string 'MovieApiContext' not found in appsettings.Development.json.");
+    connectionString = isRunningInDocker
+        ? Environment.GetEnvironmentVariable("DOCKER_SQL_CONNECTIONSTRING")
+        : null;
+    connectionString ??= builder.Configuration.GetConnectionString("MovieApiContext")
+        ?? throw new InvalidOperationException("Local connection string 'MovieApiContext' not found.");
     blobToken = builder.Configuration["VERCEL_BLOB_TOKEN"]
         ?? throw new InvalidOperationException("VERCEL_BLOB_TOKEN not found. Ensure .env contains this variable.");
 }

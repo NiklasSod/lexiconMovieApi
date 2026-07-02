@@ -1,0 +1,41 @@
+﻿# Environment files (may contain secrets)
+.env
+
+# Build outputs
+bin/
+obj/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE / Editor
+**/.vs/
+**/.vscode/
+**/*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# GitHub Actions (not needed in image)
+.github/
+
+# Test project (not needed at runtime)
+MovieApi.Tests/
+
+# Migrations (EF model snapshot is used at runtime via EnsureCreated)
+**/Migrations/
+
+# Documentation
+*.md
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# OS files
+[Dd]esktop.ini
+Thumbs.db
