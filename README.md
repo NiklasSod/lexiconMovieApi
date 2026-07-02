@@ -8,9 +8,11 @@ An ASP.NET Core 10 Web API for managing a movie database — genres, actors, mov
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - A `.env` file at `MovieApi/.env` with these keys:
   ```
+  ASPNETCORE_ENVIRONMENT=Development
   DOCKER_SQL_PASSWORD=<your-strong-password>
   VERCEL_BLOB_TOKEN=<your-token>
   JWT_SECRET=<your-jwt-secret>
+  DOCKER_SQL_CONNECTIONSTRING=<your-connectionstring>
   ```
 
 ### Option A — Build from source (with .NET SDK)

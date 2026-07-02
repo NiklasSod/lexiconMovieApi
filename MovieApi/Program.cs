@@ -17,7 +17,8 @@ string connectionString;
 string blobToken;
 if (builder.Environment.IsDevelopment())
 {
-    connectionString = builder.Configuration.GetConnectionString("MovieApiContext")
+    connectionString = Environment.GetEnvironmentVariable("DOCKER_SQL_CONNECTIONSTRING")
+        ?? builder.Configuration.GetConnectionString("MovieApiContext")
         ?? throw new InvalidOperationException("Local connection string 'MovieApiContext' not found in appsettings.Development.json.");
     blobToken = builder.Configuration["VERCEL_BLOB_TOKEN"]
         ?? throw new InvalidOperationException("VERCEL_BLOB_TOKEN not found. Ensure .env contains this variable.");
