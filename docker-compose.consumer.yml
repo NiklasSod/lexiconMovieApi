@@ -4,7 +4,7 @@
 # Replace "yourusername" with your actual Docker Hub username before using.
 services:
   movie-api:
-    image: yourusername/movieapi:latest
+    image: niklassoederberg/movieapi:latest
     ports:
       - "8080:8080"
     env_file:

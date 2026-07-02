@@ -6,7 +6,8 @@ An ASP.NET Core 10 Web API for managing a movie database — genres, actors, mov
 
 ### Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- A `.env` file at `MovieApi/.env` with these keys:
+- get docker-compose.yml file from me
+- A `.env` file at `/.env` with these keys:
   ```
   ASPNETCORE_ENVIRONMENT=Development
   DOCKER_SQL_PASSWORD=<your-strong-password>
@@ -14,6 +15,7 @@ An ASP.NET Core 10 Web API for managing a movie database — genres, actors, mov
   JWT_SECRET=<your-jwt-secret>
   DOCKER_SQL_CONNECTIONSTRING=<your-connectionstring>
   ```
+- "docker compose up -d" in terminal
 
 ### Option A — Build from source (with .NET SDK)
 ```bash
