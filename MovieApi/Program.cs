@@ -1,11 +1,16 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieApi.Extensions;
 using System.Text;
 
-Env.Load();
+// Only load .env file if it exists (not present in Docker containers — config comes from env vars)
+var envFilePath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+if (File.Exists(envFilePath))
+{
+    Env.Load(envFilePath);
+}
 
 var builder = WebApplication.CreateBuilder(args);
 string connectionString;
