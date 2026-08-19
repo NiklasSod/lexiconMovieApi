@@ -12,6 +12,7 @@ public interface IMovieApiContext
     DbSet<Actor> Actors { get; set; }
     DbSet<MovieActor> MovieActors { get; set; }
     DbSet<User> Users { get; set; }
+    DbSet<RefreshToken> RefreshTokens { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     int SaveChanges();

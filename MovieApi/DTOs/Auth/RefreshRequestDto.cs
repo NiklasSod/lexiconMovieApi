@@ -1,8 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MovieApi.DTOs.Auth;
 
-public class AuthResponseDto
+public class RefreshRequestDto
 {
-    public string AccessToken { get; set; } = string.Empty;
-
+    [Required]
     public string RefreshToken { get; set; } = string.Empty;
 }

@@ -4,5 +4,11 @@ namespace MovieApi.Services;
 
 public interface ITokenService
 {
-    string CreateToken(User user);
+    string CreateAccessToken(User user);
+
+    string CreateRefreshToken();
+
+    string HashRefreshToken(string refreshToken);
+
+    DateTime GetRefreshTokenExpiry();
 }

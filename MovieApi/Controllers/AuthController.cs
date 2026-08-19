@@ -41,7 +41,7 @@ public class AuthController : ControllerBase
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return Ok(new AuthResponseDto { Token = _tokenService.CreateToken(user) });
+        return Ok(await IssueAndPersistTokensAsync(user));
     }
 
     [HttpPost("login")]
@@ -57,6 +57,81 @@ public class AuthController : ControllerBase
             return Unauthorized("Invalid username or password.");
         }
 
-        return Ok(new AuthResponseDto { Token = _tokenService.CreateToken(user) });
+        return Ok(await IssueAndPersistTokensAsync(user));
+    }
+
+    [HttpPost("refresh")]
+    public async Task<ActionResult<AuthResponseDto>> Refresh(RefreshRequestDto dto)
+    {
+        var refreshToken = dto.RefreshToken.Trim();
+
+        if (refreshToken.Length == 0)
+        {
+            return BadRequest("Refresh token is required.");
+        }
+
+        var tokenHash = _tokenService.HashRefreshToken(refreshToken);
+
+        var storedToken = await _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash);
+
+        if (storedToken is null || storedToken.Expiry < DateTime.UtcNow)
+        {
+            return Unauthorized("Invalid or expired refresh token.");
+        }
+
+        // Rotate: invalidate the used refresh token and issue a fresh pair.
+        _context.RefreshTokens.Remove(storedToken);
+        await _context.SaveChangesAsync();
+
+        return Ok(await IssueAndPersistTokensAsync(storedToken.User));
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(RefreshRequestDto dto)
+    {
+        var refreshToken = dto.RefreshToken.Trim();
+
+        if (refreshToken.Length > 0)
+        {
+            var tokenHash = _tokenService.HashRefreshToken(refreshToken);
+
+            var storedToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash);
+
+            if (storedToken is not null)
+            {
+                _context.RefreshTokens.Remove(storedToken);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        return NoContent();
+    }
+
+    private AuthResponseDto IssueTokens(User user)
+    {
+        return new AuthResponseDto
+        {
+            AccessToken = _tokenService.CreateAccessToken(user),
+            RefreshToken = _tokenService.CreateRefreshToken(),
+        };
+    }
+
+    private async Task<AuthResponseDto> IssueAndPersistTokensAsync(User user)
+    {
+        var response = IssueTokens(user);
+
+        _context.RefreshTokens.Add(new RefreshToken
+        {
+            TokenHash = _tokenService.HashRefreshToken(response.RefreshToken),
+            Expiry = _tokenService.GetRefreshTokenExpiry(),
+            UserId = user.Id,
+        });
+
+        await _context.SaveChangesAsync();
+
+        return response;
     }
 }
