@@ -29,7 +29,5 @@ using MovieApi;
             .HasOne(ma => ma.Actor)
             .WithMany(a => a.MovieActors)
             .HasForeignKey(ma => ma.ActorId);
-
-        modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
     }
 }
