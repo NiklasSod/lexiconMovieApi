@@ -9,7 +9,6 @@ namespace MovieApi.Extensions
             using var scope = app.ApplicationServices.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<MovieApiContext>();
 
-            context.Database.EnsureCreated();
             if (context.Movie.Any())
             {
                 return;
