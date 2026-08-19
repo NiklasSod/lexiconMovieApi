@@ -110,7 +110,46 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<MovieApiContext>();
+
     dbContext.Database.Migrate();
+    app.Logger.LogInformation(
+        "Database migrated. Applied: {Applied}",
+        string.Join(", ", dbContext.Database.GetAppliedMigrations()));
+
+    // Self-heal: EF Core skips any migration already recorded in
+    // __EFMigrationsHistory, even if the underlying tables are missing.
+    // If the auth tables are absent but their migrations are recorded as
+    // applied, clear those stale history rows and re-apply them.
+    bool UsersTableExists() =>
+        dbContext.Database
+            .SqlQueryRaw<int>(
+                "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Users'")
+            .Any();
+
+    if (!UsersTableExists())
+    {
+        var applied = dbContext.Database.GetAppliedMigrations().ToHashSet();
+
+        if (applied.Contains("20260819141739_AddUser") ||
+            applied.Contains("20260819214850_AddRefreshToken"))
+        {
+            app.Logger.LogWarning(
+                "Users table missing but auth migrations are recorded as applied. " +
+                "Clearing stale history and re-applying auth migrations.");
+            dbContext.Database.ExecuteSqlRaw(
+                "DELETE FROM __EFMigrationsHistory " +
+                "WHERE MigrationId LIKE '20260819141739%' " +
+                "   OR MigrationId LIKE '20260819214850%'");
+            dbContext.Database.Migrate();
+            app.Logger.LogInformation("Auth migrations re-applied.");
+        }
+        else
+        {
+            app.Logger.LogWarning(
+                "Users table missing after Migrate() and auth migrations are not " +
+                "recorded as applied. Migrate() may not be executing in this build.");
+        }
+    }
 }
 
 app.UseAuthentication();
