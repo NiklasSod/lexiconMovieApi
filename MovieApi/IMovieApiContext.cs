@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MovieApi.Models;
 
 namespace MovieApi;
@@ -11,6 +11,7 @@ public interface IMovieApiContext
     DbSet<Review> Reviews { get; set; }
     DbSet<Actor> Actors { get; set; }
     DbSet<MovieActor> MovieActors { get; set; }
+    DbSet<User> Users { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     int SaveChanges();

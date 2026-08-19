@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieApi.Extensions;
+using MovieApi.Services;
 using System.Text;
 
 // Only load .env file if it exists (not present in Docker containers — config comes from env vars)
@@ -55,7 +56,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
         ValidateIssuer = false,
         ValidateAudience = false,
-        ValidateLifetime = false // update if app go live and real login
+        ValidateLifetime = true
     };
 });
 
@@ -63,6 +64,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddDbContext<MovieApiContext>(options => options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure()));
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -74,17 +76,18 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-}
-
-if (app.Environment.IsDevelopment())
-{
     // for hosting on railway i add this in if-statement
     app.UseHttpsRedirection();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<MovieApiContext>();
+    dbContext.Database.Migrate();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.SeedData();

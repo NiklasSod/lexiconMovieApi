@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MovieApi.Models;
 using MovieApi;
 
@@ -11,10 +11,12 @@ using MovieApi;
     public DbSet<Review> Reviews { get; set; } = default!;
     public DbSet<Actor> Actors { get; set; } = default!;
     public DbSet<MovieActor> MovieActors { get; set; } = default!;
+    public DbSet<User> Users { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
         modelBuilder.Entity<MovieActor>()
             .HasKey(ma => new { ma.MovieId, ma.ActorId });
 
@@ -27,5 +29,7 @@ using MovieApi;
             .HasOne(ma => ma.Actor)
             .WithMany(a => a.MovieActors)
             .HasForeignKey(ma => ma.ActorId);
+
+        modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
     }
 }
