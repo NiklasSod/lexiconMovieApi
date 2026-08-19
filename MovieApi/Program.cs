@@ -1,11 +1,13 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieApi;
 using MovieApi.Extensions;
 using MovieApi.Services;
 using System.Text;
+using System.Text.Json;
 
 // Only load .env file if it exists (not present in Docker containers — config comes from env vars)
 var envFilePath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
@@ -73,6 +75,29 @@ builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Global exception handler: log the full error server-side and return a
+// readable JSON body instead of an empty 500, so the frontend can surface it.
+app.UseExceptionHandler(exceptionHandlerApp =>
+{
+    exceptionHandlerApp.Run(async context =>
+    {
+        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+        var logger = context.RequestServices
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("GlobalExceptionHandler");
+        logger.LogError(exception, "Unhandled exception during {Method} {Path}",
+            context.Request.Method, context.Request.Path);
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(JsonSerializer.Serialize(new
+        {
+            message = exception?.Message ?? "An unexpected error occurred.",
+        }));
+    });
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
