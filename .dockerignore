@@ -24,9 +24,6 @@ obj/
 # Test project (not needed at runtime)
 MovieApi.Tests/
 
-# Migrations (EF model snapshot is used at runtime via EnsureCreated)
-**/Migrations/
-
 # Documentation
 *.md
 
