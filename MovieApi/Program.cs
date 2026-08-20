@@ -116,39 +116,51 @@ using (var scope = app.Services.CreateScope())
         "Database migrated. Applied: {Applied}",
         string.Join(", ", dbContext.Database.GetAppliedMigrations()));
 
-    // Self-heal: EF Core skips any migration already recorded in
-    // __EFMigrationsHistory, even if the underlying tables are missing.
-    // If the auth tables are absent but their migrations are recorded as
-    // applied, clear those stale history rows and re-apply them.
-    bool UsersTableExists() =>
-        dbContext.Database
-            .SqlQueryRaw<int>(
-                "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Users'")
-            .Any();
-
-    if (!UsersTableExists())
+    // Best-effort self-heal (never crashes startup): if the auth tables are
+    // missing but their migrations are recorded as applied (stale history),
+    // clear those history rows and re-apply them.
+    try
     {
         var applied = dbContext.Database.GetAppliedMigrations().ToHashSet();
+        var authMigrations = new[] { "20260819141739_AddUser", "20260819214850_AddRefreshToken" };
 
-        if (applied.Contains("20260819141739_AddUser") ||
-            applied.Contains("20260819214850_AddRefreshToken"))
+        if (authMigrations.Any(applied.Contains))
         {
-            app.Logger.LogWarning(
-                "Users table missing but auth migrations are recorded as applied. " +
-                "Clearing stale history and re-applying auth migrations.");
-            dbContext.Database.ExecuteSqlRaw(
-                "DELETE FROM __EFMigrationsHistory " +
-                "WHERE MigrationId LIKE '20260819141739%' " +
-                "   OR MigrationId LIKE '20260819214850%'");
-            dbContext.Database.Migrate();
-            app.Logger.LogInformation("Auth migrations re-applied.");
+            bool UsersTableExists()
+            {
+                using var command = dbContext.Database.GetDbConnection().CreateCommand();
+                command.CommandText =
+                    "SELECT CASE WHEN EXISTS (" +
+                    "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'Users') " +
+                    "THEN 1 ELSE 0 END";
+                dbContext.Database.OpenConnection();
+                try
+                {
+                    return Convert.ToInt32(command.ExecuteScalar()) == 1;
+                }
+                finally
+                {
+                    dbContext.Database.CloseConnection();
+                }
+            }
+
+            if (!UsersTableExists())
+            {
+                app.Logger.LogWarning(
+                    "Users table missing but auth migrations are recorded as applied. " +
+                    "Clearing stale history and re-applying auth migrations.");
+                dbContext.Database.ExecuteSqlRaw(
+                    "DELETE FROM __EFMigrationsHistory " +
+                    "WHERE MigrationId LIKE '20260819141739%' " +
+                    "   OR MigrationId LIKE '20260819214850%'");
+                dbContext.Database.Migrate();
+                app.Logger.LogInformation("Auth migrations re-applied.");
+            }
         }
-        else
-        {
-            app.Logger.LogWarning(
-                "Users table missing after Migrate() and auth migrations are not " +
-                "recorded as applied. Migrate() may not be executing in this build.");
-        }
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "Self-heal migration check failed - continuing startup.");
     }
 }
 
