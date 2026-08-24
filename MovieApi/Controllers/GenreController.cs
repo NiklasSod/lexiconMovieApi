@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApi.DTOs.Genre;
@@ -37,6 +37,19 @@ namespace MovieApi.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetGenreById), new { id = genre.Id }, genre);
+        }
+
+        // GET: api/Genre
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<GenreDto>>> GetGenres()
+        {
+            return await _context.Genres
+                .Select(g => new GenreDto
+                {
+                    Id = g.Id,
+                    Name = g.Name
+                })
+                .ToListAsync();
         }
 
         // GET api/Genre/5
